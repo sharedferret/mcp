@@ -1,10 +1,10 @@
-// Copyright (c) Microsoft Corporation.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System.Text.Json.Serialization;
 using Azure.Mcp.Core.Options;
 
-namespace Azure.Mcp.Tools.Redis.Options.CacheForRedis;
+namespace Azure.Mcp.Tools.Redis.Options.RedisCommon;
 
 public class BaseCacheOptions : SubscriptionOptions
 {

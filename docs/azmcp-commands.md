@@ -1089,11 +1089,8 @@ azmcp redis cluster database list --subscription <subscription> \
                                   --resource-group <resource-group> \
                                   --cluster <cluster>
 
-# Lists Redis Clusters in the Azure Managed Redis or Azure Redis Enterprise services
-azmcp redis cluster list --subscription <subscription>
-
-# Lists Redis Caches in the Azure Cache for Redis service
-azmcp redis cache list --subscription <subscription>
+# Lists Redis Caches in the Azure Cache for Redis, Azure Managed Redis, or Azure Redis Enterprise services
+azmcp redis list --subscription <subscription>
 
 # Lists Access Policy Assignments in an Azure Redis Cache
 azmcp redis cache list accesspolicy --subscription <subscription> \

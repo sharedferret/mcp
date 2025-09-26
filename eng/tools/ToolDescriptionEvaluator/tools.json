@@ -527,9 +527,9 @@
       ]
     },
     {
-      "name": "list",
-      "description": "List all key-values in an App Configuration store. This command retrieves and displays all key-value pairs\r\nfrom the specified store. Each key-value includes its key, value, label, content type, ETag, last modified\r\ntime, and lock status.",
-      "command": "azmcp appconfig kv list",
+      "name": "get",
+      "description": "Gets key-values in an App Configuration store. This command can either retrieve a specific key-value by its key\r\nand optional label, or list key-values if no key is provided. Listing key-values can optionally be filtered by a\r\nkey filter and label filter. Each key-value includes its key, value, label, content type, ETag, last modified time,\r\nand lock status.",
+      "command": "azmcp appconfig kv get",
       "option": [
         {
           "name": "--tenant",
@@ -587,12 +587,24 @@
         },
         {
           "name": "--key",
-          "description": "Specifies the key filter, if any, to be used when retrieving key-values. The filter can be an exact match, for example a filter of 'foo' would get all key-values with a key of 'foo', or the filter can include a '*' character at the end of the string for wildcard searches (e.g., 'App*'). If omitted all keys will be retrieved.",
+          "description": "The name of the key to access within the App Configuration store.",
           "type": "string",
           "required": null
         },
         {
           "name": "--label",
+          "description": "The label to apply to the configuration key. Labels are used to group and organize settings.",
+          "type": "string",
+          "required": null
+        },
+        {
+          "name": "--key-filter",
+          "description": "Specifies the key filter, if any, to be used when retrieving key-values. The filter can be an exact match, for example a filter of 'foo' would get all key-values with a key of 'foo', or the filter can include a '*' character at the end of the string for wildcard searches (e.g., 'App*'). If omitted all keys will be retrieved.",
+          "type": "string",
+          "required": null
+        },
+        {
+          "name": "--label-filter",
           "description": "Specifies the label filter, if any, to be used when retrieving key-values. The filter can be an exact match, for example a filter of 'foo' would get all key-values with a label of 'foo', or the filter can include a '*' character at the end of the string for wildcard searches (e.g., 'Prod*'). This filter is case-sensitive. If omitted, all labels will be retrieved.",
           "type": "string",
           "required": null
@@ -770,85 +782,6 @@
         {
           "name": "--tags",
           "description": "The tags to associate with the configuration key. Tags should be in the format 'key=value'. Multiple tags can be specified.",
-          "type": "string",
-          "required": null
-        }
-      ]
-    },
-    {
-      "name": "show",
-      "description": "Show a specific key-value setting in an App Configuration store. This command retrieves and displays the value,\r\nlabel, content type, ETag, last modified time, and lock status for a specific setting. You must specify an\r\naccount name and key. Optionally, you can specify a label otherwise the setting with default label will be retrieved.\r\nYou can also specify a content type to indicate how the value should be interpreted.",
-      "command": "azmcp appconfig kv show",
-      "option": [
-        {
-          "name": "--tenant",
-          "description": "The Microsoft Entra ID tenant ID or name. This can be either the GUID identifier or the display name of your Entra ID tenant.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--auth-method",
-          "description": "Authentication method to use. Options: 'credential' (Azure CLI/managed identity), 'key' (access key), or 'connectionString'.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--retry-delay",
-          "description": "Initial delay in seconds between retry attempts. For exponential backoff, this value is used as the base.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--retry-max-delay",
-          "description": "Maximum delay in seconds between retries, regardless of the retry strategy.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--retry-max-retries",
-          "description": "Maximum number of retry attempts for failed operations before giving up.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--retry-mode",
-          "description": "Retry strategy to use. 'fixed' uses consistent delays, 'exponential' increases delay between attempts.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--retry-network-timeout",
-          "description": "Network operation timeout in seconds. Operations taking longer than this will be cancelled.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--subscription",
-          "description": "Specifies the Azure subscription to use. Accepts either a subscription ID (GUID) or display name. If not specified, the AZURE_SUBSCRIPTION_ID environment variable will be used instead.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--account",
-          "description": "The name of the App Configuration store (e.g., my-appconfig).",
-          "type": "string",
-          "required": true
-        },
-        {
-          "name": "--key",
-          "description": "The name of the key to access within the App Configuration store.",
-          "type": "string",
-          "required": true
-        },
-        {
-          "name": "--label",
-          "description": "The label to apply to the configuration key. Labels are used to group and organize settings.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--content-type",
-          "description": "The content type of the configuration value. This is used to indicate how the value should be interpreted or parsed.",
           "type": "string",
           "required": null
         }
@@ -7488,61 +7421,6 @@
     },
     {
       "name": "list",
-      "description": "List all Redis Cache resources in a specified subscription. Returns an array of Redis Cache details.\r\nUse this command to explore which Redis Cache resources are available in your subscription.",
-      "command": "azmcp redis cache list",
-      "option": [
-        {
-          "name": "--tenant",
-          "description": "The Microsoft Entra ID tenant ID or name. This can be either the GUID identifier or the display name of your Entra ID tenant.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--auth-method",
-          "description": "Authentication method to use. Options: 'credential' (Azure CLI/managed identity), 'key' (access key), or 'connectionString'.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--retry-delay",
-          "description": "Initial delay in seconds between retry attempts. For exponential backoff, this value is used as the base.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--retry-max-delay",
-          "description": "Maximum delay in seconds between retries, regardless of the retry strategy.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--retry-max-retries",
-          "description": "Maximum number of retry attempts for failed operations before giving up.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--retry-mode",
-          "description": "Retry strategy to use. 'fixed' uses consistent delays, 'exponential' increases delay between attempts.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--retry-network-timeout",
-          "description": "Network operation timeout in seconds. Operations taking longer than this will be cancelled.",
-          "type": "string",
-          "required": null
-        },
-        {
-          "name": "--subscription",
-          "description": "Specifies the Azure subscription to use. Accepts either a subscription ID (GUID) or display name. If not specified, the AZURE_SUBSCRIPTION_ID environment variable will be used instead.",
-          "type": "string",
-          "required": null
-        }
-      ]
-    },
-    {
-      "name": "list",
       "description": "List the databases in the specified Redis Cluster resource. Returns an array of Redis database details.\r\nUse this command to explore which databases are available in your Redis Cluster.",
       "command": "azmcp redis cluster database list",
       "option": [
@@ -7610,8 +7488,8 @@
     },
     {
       "name": "list",
-      "description": "List all Redis Cluster resources in a specified subscription. Returns an array of Redis Cluster details.\r\nUse this command to explore which Redis Cluster resources are available in your subscription.",
-      "command": "azmcp redis cluster list",
+      "description": "List/show all Redis Caches in a subscription. Returns Redis Cache details including Azure Cache for Redis resources (Basic, Standard, and Premium tier caches), Azure Managed Redis clusters, and Azure Redis Enterprise clusters. Use this command to explore and view which Redis Cache resources are available in your subscription.",
+      "command": "azmcp redis list",
       "option": [
         {
           "name": "--tenant",
@@ -10604,5 +10482,5 @@
     }
   ],
   "consolidated_azure_tools": null,
-  "duration": 25
+  "duration": 42
 }

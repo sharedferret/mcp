@@ -9,6 +9,7 @@ using Azure.Mcp.Core.Services.Azure.Subscription;
 using Azure.Mcp.Core.Services.Azure.Tenant;
 using Azure.Mcp.Tools.Redis.Models.CacheForRedis;
 using Azure.Mcp.Tools.Redis.Models.ManagedRedis;
+using Azure.Mcp.Tools.Redis.Models.RedisCommon;
 using Azure.ResourceManager.Redis;
 using Azure.ResourceManager.Redis.Models;
 using Azure.ResourceManager.RedisEnterprise;
@@ -18,7 +19,7 @@ namespace Azure.Mcp.Tools.Redis.Services;
 public class RedisService(ISubscriptionService _subscriptionService, IResourceGroupService _resourceGroupService, ITenantService tenantService)
     : BaseAzureService(tenantService), IRedisService
 {
-    public async Task<IEnumerable<Cache>> ListCachesAsync(
+    public async Task<IEnumerable<Cache>> ListAllCachesAsync(
         string subscription,
         string? tenant = null,
         AuthMethod? authMethod = null,
@@ -28,23 +29,33 @@ public class RedisService(ISubscriptionService _subscriptionService, IResourceGr
 
         try
         {
-            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, tenant, retryPolicy) ?? throw new Exception($"Subscription '{subscription}' not found");
-            var caches = new List<Cache>();
+            ResourceManager.Resources.SubscriptionResource subscriptionResource = await _subscriptionService.GetSubscription(subscription, tenant, retryPolicy) ?? throw new Exception($"Subscription '{subscription}' not found");
 
-            await foreach (var cacheResource in subscriptionResource.GetAllRedisAsync())
+            var acrTask = subscriptionResource.GetAllRedisAsync().ToListAsync();
+            var amrTask = subscriptionResource.GetRedisEnterpriseClustersAsync().ToListAsync();
+            await Task.WhenAll(acrTask.AsTask(), amrTask.AsTask());
+
+            List<RedisResource>? acrCacheResources = await acrTask;
+            List<RedisEnterpriseClusterResource>? amrClusterResources = await amrTask;
+
+            List<Cache> caches = new List<Cache>();
+
+            foreach (RedisResource acrCacheResource in acrCacheResources)
             {
-                if (string.IsNullOrWhiteSpace(cacheResource?.Id.ToString())
-                    || string.IsNullOrWhiteSpace(cacheResource.Data.Name))
+                if (string.IsNullOrWhiteSpace(acrCacheResource?.Id.ToString())
+                    || string.IsNullOrWhiteSpace(acrCacheResource.Data.Name))
                 {
                     continue;
                 }
 
-                var cache = cacheResource.Data;
+                RedisData cache = acrCacheResource.Data;
+
                 caches.Add(new()
                 {
                     Name = cache.Name,
-                    ResourceGroupName = cacheResource.Id.ResourceGroupName,
-                    SubscriptionId = cacheResource.Id.SubscriptionId,
+                    Type = "CacheForRedis",
+                    ResourceGroupName = acrCacheResource.Id.ResourceGroupName,
+                    SubscriptionId = acrCacheResource.Id.SubscriptionId,
                     Location = cache.Location,
                     Sku = $"{cache.Sku.Name} {cache.Sku.Family}{cache.Sku.Capacity}",
                     ProvisioningState = cache.ProvisioningState?.ToString(),
@@ -106,6 +117,51 @@ public class RedisService(ISubscriptionService _subscriptionService, IResourceGr
                 });
             }
 
+            foreach (RedisEnterpriseClusterResource amrClusterResource in amrClusterResources)
+            {
+                if (string.IsNullOrWhiteSpace(amrClusterResource?.Id.ToString())
+                    || string.IsNullOrWhiteSpace(amrClusterResource.Data.Name))
+                {
+                    continue;
+                }
+
+                RedisEnterpriseClusterData cluster = amrClusterResource.Data;
+                caches.Add(new()
+                {
+                    Name = cluster.Name,
+                    Type = "ManagedRedis",
+                    ResourceGroupName = amrClusterResource.Id.ResourceGroupName,
+                    SubscriptionId = amrClusterResource.Id.SubscriptionId,
+                    Location = cluster.Location,
+                    Sku = cluster.Sku.Name.ToString(),
+                    ProvisioningState = cluster.ProvisioningState?.ToString(),
+                    HostName = cluster.HostName,
+                    RedisVersion = cluster.RedisVersion,
+                    ResourceState = cluster.ResourceState.ToString(),
+                    MinimumTlsVersion = cluster.MinimumTlsVersion.ToString(),
+                    PrivateEndpointConnections = cluster.PrivateEndpointConnections.Any() ?
+                        [.. cluster.PrivateEndpointConnections.Select(connection => connection.Id.ToString())]
+                        : null,
+                    Identity = cluster.Identity is null ? null : new ManagedIdentityInfo
+                    {
+                        SystemAssignedIdentity = new SystemAssignedIdentityInfo
+                        {
+                            Enabled = cluster.Identity != null,
+                            TenantId = cluster.Identity?.TenantId?.ToString(),
+                            PrincipalId = cluster.Identity?.PrincipalId?.ToString()
+                        },
+                        UserAssignedIdentities = cluster.Identity?.UserAssignedIdentities?
+                            .Select(identity => new UserAssignedIdentityInfo
+                            {
+                                ClientId = identity.Value.ClientId?.ToString(),
+                                PrincipalId = identity.Value.PrincipalId?.ToString()
+                            }).ToArray()
+                    },
+                    Zones = cluster.Zones?.Any() == true ? [.. cluster.Zones] : null,
+                    Tags = cluster.Tags.Any() ? cluster.Tags : null,
+                });
+            }
+
             return caches;
         }
         catch (Exception ex)
@@ -153,71 +209,6 @@ public class RedisService(ISubscriptionService _subscriptionService, IResourceGr
         catch (Exception ex)
         {
             throw new Exception($"Error retrieving Redis cache access policy assignments: {ex.Message}", ex);
-        }
-    }
-
-    public async Task<IEnumerable<Cluster>> ListClustersAsync(
-        string subscription,
-        string? tenant = null,
-        AuthMethod? authMethod = null,
-        RetryPolicyOptions? retryPolicy = null)
-    {
-        ValidateRequiredParameters(subscription);
-
-        try
-        {
-            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, tenant, retryPolicy) ?? throw new Exception($"Subscription '{subscription}' not found");
-            var clusters = new List<Cluster>();
-
-            await foreach (var clusterResource in subscriptionResource.GetRedisEnterpriseClustersAsync())
-            {
-                if (string.IsNullOrWhiteSpace(clusterResource?.Id.ToString())
-                    || string.IsNullOrWhiteSpace(clusterResource.Data.Name))
-                {
-                    continue;
-                }
-
-                var cluster = clusterResource.Data;
-                clusters.Add(new()
-                {
-                    Name = cluster.Name,
-                    ResourceGroupName = clusterResource.Id.ResourceGroupName,
-                    SubscriptionId = clusterResource.Id.SubscriptionId,
-                    Location = cluster.Location,
-                    Sku = cluster.Sku.Name.ToString(),
-                    ProvisioningState = cluster.ProvisioningState?.ToString(),
-                    HostName = cluster.HostName,
-                    RedisVersion = cluster.RedisVersion,
-                    ResourceState = cluster.ResourceState.ToString(),
-                    MinimumTlsVersion = cluster.MinimumTlsVersion.ToString(),
-                    PrivateEndpointConnections = cluster.PrivateEndpointConnections.Any() ?
-                        [.. cluster.PrivateEndpointConnections.Select(connection => connection.Id.ToString())]
-                        : null,
-                    Identity = cluster.Identity is null ? null : new ManagedIdentityInfo
-                    {
-                        SystemAssignedIdentity = new SystemAssignedIdentityInfo
-                        {
-                            Enabled = cluster.Identity != null,
-                            TenantId = cluster.Identity?.TenantId?.ToString(),
-                            PrincipalId = cluster.Identity?.PrincipalId?.ToString()
-                        },
-                        UserAssignedIdentities = cluster.Identity?.UserAssignedIdentities?
-                            .Select(identity => new UserAssignedIdentityInfo
-                            {
-                                ClientId = identity.Value.ClientId?.ToString(),
-                                PrincipalId = identity.Value.PrincipalId?.ToString()
-                            }).ToArray()
-                    },
-                    Zones = cluster.Zones?.Any() == true ? [.. cluster.Zones] : null,
-                    Tags = cluster.Tags.Any() ? cluster.Tags : null,
-                });
-            }
-
-            return clusters;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Error retrieving Redis clusters: {ex.Message}", ex);
         }
     }
 

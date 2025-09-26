@@ -1,17 +1,17 @@
-// Copyright (c) Microsoft Corporation.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using Azure.Mcp.Core.Commands;
 using Azure.Mcp.Core.Commands.Subscription;
-using Azure.Mcp.Tools.Redis.Models.CacheForRedis;
-using Azure.Mcp.Tools.Redis.Options.CacheForRedis;
+using Azure.Mcp.Tools.Redis.Models.RedisCommon;
+using Azure.Mcp.Tools.Redis.Options.RedisCommon;
 using Azure.Mcp.Tools.Redis.Services;
 using Microsoft.Extensions.Logging;
 
-namespace Azure.Mcp.Tools.Redis.Commands.CacheForRedis;
+namespace Azure.Mcp.Tools.Redis.Commands.RedisCommon;
 
 /// <summary>
-/// Lists Azure Cache for Redis resources (Basic, Standard, and Premium tier caches) in the specified subscription.
+/// Lists Azure Cache for Redis caches (Basic, Standard, and Premium tier caches), and Azure Managed Redis and Azure Redis Enterprise clusters (`Balanced`, `MemoryOptimized`, `FlashOptimized`, `ComputeOptimized`, `Enterprise`, `EnterpriseFlash` tier clusters) in the specified subscription.
 /// </summary>
 public sealed class CacheListCommand(ILogger<CacheListCommand> logger) : SubscriptionCommand<CacheListOptions>()
 {
@@ -22,7 +22,7 @@ public sealed class CacheListCommand(ILogger<CacheListCommand> logger) : Subscri
 
     public override string Description =>
         $"""
-        List/show all Redis Caches in a subscription. Returns Redis Cache details including Azure Cache for Redis resources (Basic, Standard, and Premium tier caches). Use this command to explore and view which Redis Cache resources are available in your subscription.
+        List/show all Redis Caches in a subscription. Returns Redis Cache details including Azure Cache for Redis resources (Basic, Standard, and Premium tier caches), Azure Managed Redis clusters, and Azure Redis Enterprise clusters. Use this command to explore and view which Redis Cache resources are available in your subscription.
         """;
 
     public override string Title => CommandTitle;
@@ -49,7 +49,7 @@ public sealed class CacheListCommand(ILogger<CacheListCommand> logger) : Subscri
         try
         {
             var redisService = context.GetService<IRedisService>() ?? throw new InvalidOperationException("Redis service is not available.");
-            var caches = await redisService.ListCachesAsync(
+            var caches = await redisService.ListAllCachesAsync(
                 options.Subscription!,
                 options.Tenant,
                 options.AuthMethod,

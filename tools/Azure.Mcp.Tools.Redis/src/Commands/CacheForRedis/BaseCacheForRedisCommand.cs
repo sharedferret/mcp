@@ -10,9 +10,9 @@ using Azure.Mcp.Tools.Redis.Options.CacheForRedis;
 
 namespace Azure.Mcp.Tools.Redis.Commands.CacheForRedis;
 
-public abstract class BaseCacheCommand<
+public abstract class BaseCacheForRedisCommand<
     [DynamicallyAccessedMembers(TrimAnnotations.CommandAnnotations)] T>
-    : SubscriptionCommand<T> where T : BaseCacheOptions, new()
+    : SubscriptionCommand<T> where T : BaseCacheForRedisOptions, new()
 {
 
     protected override void RegisterOptions(Command command)

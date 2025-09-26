@@ -5,6 +5,7 @@ using Azure.Mcp.Core.Areas;
 using Azure.Mcp.Core.Commands;
 using Azure.Mcp.Tools.Redis.Commands.CacheForRedis;
 using Azure.Mcp.Tools.Redis.Commands.ManagedRedis;
+using Azure.Mcp.Tools.Redis.Commands.RedisCommon;
 using Azure.Mcp.Tools.Redis.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,7 +21,6 @@ public class RedisSetup : IAreaSetup
 
         services.AddSingleton<CacheListCommand>();
         services.AddSingleton<AccessPolicyListCommand>();
-        services.AddSingleton<ClusterListCommand>();
         services.AddSingleton<DatabaseListCommand>();
     }
 
@@ -32,9 +32,6 @@ public class RedisSetup : IAreaSetup
         var cache = new CommandGroup("cache", "Redis Cache resource operations - Commands for listing and managing Redis Cache resources in your Azure subscription.");
         redis.AddSubGroup(cache);
 
-        var cacheList = serviceProvider.GetRequiredService<CacheListCommand>();
-        cache.AddCommand(cacheList.Name, cacheList);
-
         var accessPolicy = new CommandGroup("accesspolicy", "Redis Cluster database operations - Commands for listing and managing Redis Cluster databases in your Azure subscription.");
         cache.AddSubGroup(accessPolicy);
 
@@ -45,14 +42,15 @@ public class RedisSetup : IAreaSetup
         var cluster = new CommandGroup("cluster", "Redis Cluster resource operations - Commands for listing and managing Redis Cluster resources in your Azure subscription.");
         redis.AddSubGroup(cluster);
 
-        var clusterList = serviceProvider.GetRequiredService<ClusterListCommand>();
-        cluster.AddCommand(clusterList.Name, clusterList);
-
         var database = new CommandGroup("database", "Redis Cluster database operations - Commands for listing and managing Redis Cluster Databases in your Azure subscription.");
         cluster.AddSubGroup(database);
 
         var databaseList = serviceProvider.GetRequiredService<DatabaseListCommand>();
         database.AddCommand(databaseList.Name, databaseList);
+
+        // Common Redis
+        var redisCacheList = serviceProvider.GetRequiredService<CacheListCommand>();
+        redis.AddCommand(redisCacheList.Name, redisCacheList);
 
         return redis;
     }

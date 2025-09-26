@@ -12,7 +12,7 @@ namespace Azure.Mcp.Tools.Redis.Commands.CacheForRedis;
 /// <summary>
 /// Lists the access policy assignments in the specified Azure cache.
 /// </summary>
-public sealed class AccessPolicyListCommand(ILogger<AccessPolicyListCommand> logger) : BaseCacheCommand<AccessPolicyListOptions>()
+public sealed class AccessPolicyListCommand(ILogger<AccessPolicyListCommand> logger) : BaseCacheForRedisCommand<AccessPolicyListOptions>()
 {
     private const string CommandTitle = "List Redis Cache Access Policy Assignments";
     private readonly ILogger<AccessPolicyListCommand> _logger = logger;
