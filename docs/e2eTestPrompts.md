@@ -357,9 +357,6 @@ This file contains prompts used for end-to-end testing to ensure each tool is in
 | azmcp_redis_cache_list | Show me the Redis Caches in my subscription |
 | azmcp_redis_cluster_database_list | List all databases in the Redis Cluster <cluster_name> |
 | azmcp_redis_cluster_database_list | Show me the databases in the Redis Cluster <cluster_name> |
-| azmcp_redis_cluster_list | List all Redis Clusters in my subscription |
-| azmcp_redis_cluster_list | Show me my Redis Clusters |
-| azmcp_redis_cluster_list | Show me the Redis Clusters in my subscription |
 
 ## Azure Resource Group
 

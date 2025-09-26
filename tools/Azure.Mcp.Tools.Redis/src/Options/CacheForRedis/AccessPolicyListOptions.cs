@@ -3,4 +3,4 @@
 
 namespace Azure.Mcp.Tools.Redis.Options.CacheForRedis;
 
-public class AccessPolicyListOptions : BaseCacheOptions;
+public class AccessPolicyListOptions : BaseCacheForRedisOptions;
