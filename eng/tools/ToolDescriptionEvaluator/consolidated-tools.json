@@ -1190,8 +1190,7 @@
         "localRequired": false
       },
       "available_commands": [
-        "mcp_azure-mcp-ser_azmcp_redis_cache_list",
-        "mcp_azure-mcp-ser_azmcp_redis_cluster_list",
+        "mcp_azure-mcp-ser_azmcp_redis_list",
         "mcp_azure-mcp-ser_azmcp_redis_cache_accesspolicy_list",
         "mcp_azure-mcp-ser_azmcp_redis_cluster_database_list"
       ]

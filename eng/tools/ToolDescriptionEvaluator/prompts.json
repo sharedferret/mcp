@@ -63,9 +63,11 @@
   "azmcp_appconfig_kv_delete": [
     "Delete the key <key_name> in App Configuration store <app_config_store_name>"
   ],
-  "azmcp_appconfig_kv_list": [
+  "azmcp_appconfig_kv_get": [
     "List all key-value settings in App Configuration store <app_config_store_name>",
-    "Show me the key-value settings in App Configuration store <app_config_store_name>"
+    "Show me the key-value settings in App Configuration store <app_config_store_name>",
+    "List all key-value settings with key name starting with 'prod-' in App Configuration store <app_config_store_name>",
+    "Show the content for the key <key_name> in App Configuration store <app_config_store_name>"
   ],
   "azmcp_appconfig_kv_lock_set": [
     "Lock the key <key_name> in App Configuration store <app_config_store_name>",
@@ -73,9 +75,6 @@
   ],
   "azmcp_appconfig_kv_set": [
     "Set the key <key_name> in App Configuration store <app_config_store_name> to <value>"
-  ],
-  "azmcp_appconfig_kv_show": [
-    "Show the content for the key <key_name> in App Configuration store <app_config_store_name>"
   ],
   "azmcp_applens_resource_diagnose": [
     "Please help me diagnose issues with my app using app lens",
@@ -473,7 +472,7 @@
     "List all access policies in the Redis Cache <cache_name>",
     "Show me the access policies in the Redis Cache <cache_name>"
   ],
-  "azmcp_redis_cache_list": [
+  "azmcp_redis_list": [
     "List all Redis Caches in my subscription",
     "Show me my Redis Caches",
     "Show me the Redis Caches in my subscription"
@@ -481,11 +480,6 @@
   "azmcp_redis_cluster_database_list": [
     "List all databases in the Redis Cluster <cluster_name>",
     "Show me the databases in the Redis Cluster <cluster_name>"
-  ],
-  "azmcp_redis_cluster_list": [
-    "List all Redis Clusters in my subscription",
-    "Show me my Redis Clusters",
-    "Show me the Redis Clusters in my subscription"
   ],
   "azmcp_group_list": [
     "List all resource groups in my subscription",

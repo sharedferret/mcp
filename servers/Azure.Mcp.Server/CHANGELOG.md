@@ -11,6 +11,7 @@ The Azure MCP Server updates automatically by default whenever a new release com
 ### Breaking Changes
 
 - Merged `azmcp_appconfig_kv_list` and `azmcp_appconfig_kv_show` into `azmcp_appconfig_kv_get` which can handle both listing and filtering key-values and getting a specific key-value. [[#505](https://github.com/microsoft/mcp/pull/505)]
+- Replaced `azmcp_redis_cache_list` and `azmcp_redis_cluster_list` with a unified `azmcp_redis_list` command that lists all Redis resources in a subscription.
 
 ### Bugs Fixed
 
